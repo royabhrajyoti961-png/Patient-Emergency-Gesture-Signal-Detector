@@ -4,7 +4,7 @@ from utils.hand_tracker import get_hand_landmarks
 
 cap = cv2.VideoCapture(0)
 
-label = input("Enter gesture label: ")
+label = input("Enter gesture label (one/two/fist etc): ")
 
 file = open('gesture_data.csv', 'a', newline='')
 writer = csv.writer(file)
