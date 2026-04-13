@@ -3,5 +3,5 @@ mediapipe
 numpy
 pandas
 scikit-learn
-pickle-mixin
 pygame
+twilio
