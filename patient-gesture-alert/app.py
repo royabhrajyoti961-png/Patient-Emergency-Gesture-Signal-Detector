@@ -5,6 +5,8 @@ from utils.hand_tracker import get_hand_landmarks
 from utils.predictor import predict_gesture
 from utils.alert import trigger_alert
 from config.labels import GESTURE_LABELS
+import sys
+import os
 
 st.title("🏥 Patient Gesture Alert System")
 
