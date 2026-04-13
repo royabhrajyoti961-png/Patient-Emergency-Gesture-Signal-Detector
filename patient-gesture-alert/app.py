@@ -1,35 +1,46 @@
+import streamlit as st
 import cv2
+import numpy as np
 from utils.hand_tracker import get_hand_landmarks
 from utils.predictor import predict_gesture
 from utils.alert import trigger_alert
 from config.labels import GESTURE_LABELS
 
-cap = cv2.VideoCapture(0)
+st.title("🏥 Patient Gesture Alert System")
 
-last_alert = None  # avoid spam SMS
+run = st.checkbox("Start Camera")
 
-while True:
-    success, img = cap.read()
+FRAME_WINDOW = st.image([])
 
-    data, img = get_hand_landmarks(img)
+camera = cv2.VideoCapture(0)
+
+last_alert = None
+
+while run:
+    success, frame = camera.read()
+    if not success:
+        st.write("Camera not working")
+        break
+
+    data, frame = get_hand_landmarks(frame)
 
     if data:
         gesture = predict_gesture(data)
         message = GESTURE_LABELS.get(gesture, "Unknown")
 
-        cv2.putText(img, message, (50, 50),
+        cv2.putText(frame, message, (50, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 1,
                     (0, 0, 255), 3)
 
-        # Trigger alert only if new emergency
+        # ALERT
         if message == "EMERGENCY" and last_alert != message:
             trigger_alert(message)
             last_alert = message
 
-    cv2.imshow("Patient Gesture Alert System", img)
+        st.success(f"Detected: {message}")
 
-    if cv2.waitKey(1) & 0xFF == 27:
-        break
+    # Convert to RGB for Streamlit
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    FRAME_WINDOW.image(frame)
 
-cap.release()
-cv2.destroyAllWindows()
+camera.release()
