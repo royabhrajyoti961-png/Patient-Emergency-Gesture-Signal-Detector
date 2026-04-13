@@ -1,10 +1,12 @@
 import cv2
 from utils.hand_tracker import get_hand_landmarks
 from utils.predictor import predict_gesture
-from utils.alert import play_alert, show_alert
+from utils.alert import trigger_alert
 from config.labels import GESTURE_LABELS
 
 cap = cv2.VideoCapture(0)
+
+last_alert = None  # avoid spam SMS
 
 while True:
     success, img = cap.read()
@@ -19,11 +21,12 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 1,
                     (0, 0, 255), 3)
 
-        if message == "EMERGENCY":
-            play_alert()
-            show_alert(message)
+        # Trigger alert only if new emergency
+        if message == "EMERGENCY" and last_alert != message:
+            trigger_alert(message)
+            last_alert = message
 
-    cv2.imshow("Patient Alert System", img)
+    cv2.imshow("Patient Gesture Alert System", img)
 
     if cv2.waitKey(1) & 0xFF == 27:
         break
